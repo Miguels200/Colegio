@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Agregar Cursos</title>
+  
+  <style>
+body {
+  font-family: Arial, sans-serif;
+  background-image: url('colegio.jpg');
+      background-repeat: repeat;
+      background-size: cover;
+      background-position: center;
+}
+
+h1 {
+  text-align: center;
+}
+.navbar {
+      background-color: #05b87c;
+      color: #fff;
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+    }
+    .navbar h1 {
+      margin: 0;
+      flex: 1;
+      padding-left: 20px;
+    }
+    .navbar ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+    .navbar ul li {
+      margin-right: 10px;
+    }
+    .navbar ul li a {
+      color: #fff;
+      text-decoration: none;
+      padding: 5px;
+    }
+  
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #f9f9fa;
+      border-radius: 5px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      margin-top: 20px;
+    }
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  color: #4CAF50;
+  margin-bottom: 5px;
+}
+
+input[type="text"] {
+  width: 50%;
+  padding: 10px;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tbody tr:hover {
+  background-color: #d4e9ff;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+.actions button {
+  margin-right: 5px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>Registrar Cursos</h1>
+  </div>
+
+
+  <div class="container">
+    <form id="formulario">
+      <div class="form-group">
+        <label for="codigo">Código del Curso:</label>
+        <input type="text" id="codigo" required>
+      </div>
+      <div class="form-group">
+        <label for="nombre">Nombre del Curso:</label>
+        <input type="text" id="nombre" required>
+      </div>
+      <div class="form-group">
+        <label for="duracion">Duración del Curso:</label>
+        <input type="text" id="duracion" required>
+      </div>
+      <div class="form-group">
+        <label for="docente">Docente:</label>
+        <input type="text" id="docente" required>
+      </div>
+      <button type="submit">Agregar</button>
+    </form>
+
+    <table id="tabla-cursos">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Duración</th>
+          <th>Docente</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Los cursos se agregarán dinámicamente aquí -->
+      </tbody>
+    </table>
+  </div>
+
+  <script >
+    const formulario = document.getElementById('formulario');
+const tablaCursos = document.getElementById('tabla-cursos');
+const tbody = tablaCursos.querySelector('tbody');
+
+formulario.addEventListener('submit', (e) => {
+  e.preventDefault();
+  
+  const codigo = document.getElementById('codigo').value;
+  const nombre = document.getElementById('nombre').value;
+  const duracion = document.getElementById('duracion').value;
+  const docente = document.getElementById('docente').value;
+  
+  // Agregar el curso a la tabla
+  agregarCurso(codigo, nombre, duracion, docente);
+  
+  // Limpiar el formulario
+  formulario.reset();
+});
+
+tablaCursos.addEventListener('click', (e) => {
+  const fila = e.target.parentElement.parentElement;
+  const codigo = fila.cells[0].textContent;
+  const nombre = fila.cells[1].textContent;
+  const duracion = fila.cells[2].textContent;
+  const docente = fila.cells[3].textContent;
+  
+  if (e.target.classList.contains('btn-editar')) {
+    editarCurso(fila, codigo, nombre, duracion, docente);
+  } else if (e.target.classList.contains('btn-guardar')) {
+    guardarEdicion(fila);
+  } else if (e.target.classList.contains('btn-cancelar')) {
+    cancelarEdicion(fila, codigo, nombre, duracion, docente);
+  } else if (e.target.classList.contains('btn-eliminar')) {
+    eliminarCurso(fila);
+  }
+});
+
+function agregarCurso(codigo, nombre, duracion, docente) {
+  const fila = document.createElement('tr');
+  fila.innerHTML = `
+    <td>${codigo}</td>
+    <td>${nombre}</td>
+    <td>${duracion}</td>
+    <td>${docente}</td>
+    <td class="actions">
+      <button class="btn-editar">Editar</button>
+      <button class="btn-eliminar">Eliminar</button>
+    </td>
+  `;
+
+  tbody.appendChild(fila);
+}
+
+function editarCurso(fila, codigo, nombre, duracion, docente) {
+  const codigoInput = document.createElement('input');
+  codigoInput.type = 'text';
+  codigoInput.value = codigo;
+  
+  const nombreInput = document.createElement('input');
+  nombreInput.type = 'text';
+  nombreInput.value = nombre;
+  
+  const duracionInput = document.createElement('input');
+  duracionInput.type = 'text';
+  duracionInput.value = duracion;
+  
+  const docenteInput = document.createElement('input');
+  docenteInput.type = 'text';
+  docenteInput.value = docente;
+  
+  fila.cells[0].innerHTML = '';
+  fila.cells[0].appendChild(codigoInput);
+  
+  fila.cells[1].innerHTML = '';
+  fila.cells[1].appendChild(nombreInput);
+  
+  fila.cells[2].innerHTML = '';
+  fila.cells[2].appendChild(duracionInput);
+  
+  fila.cells[3].innerHTML = '';
+  fila.cells[3].appendChild(docenteInput);
+  
+  fila.cells[4].innerHTML = `
+    <button class="btn-guardar">Guardar</button>
+    <button class="btn-cancelar">Cancelar</button>
+  `;
+}
+
+function guardarEdicion(fila) {
+  const codigo = fila.cells[0].querySelector('input').value;
+  const nombre = fila.cells[1].querySelector('input').value;
+  const duracion = fila.cells[2].querySelector('input').value;
+  const docente = fila.cells[3].querySelector('input').value;
+  
+  fila.cells[0].innerHTML = codigo;
+  fila.cells[1].innerHTML = nombre;
+  fila.cells[2].innerHTML = duracion;
+  fila.cells[3].innerHTML = docente;
+  
+  fila.cells[4].innerHTML = `
+    <button class="btn-editar">Editar</button>
+    <button class="btn-eliminar">Eliminar</button>
+  `;
+}
+
+function cancelarEdicion(fila, codigo, nombre, duracion, docente) {
+  fila.cells[0].innerHTML = codigo;
+  fila.cells[1].innerHTML = nombre;
+  fila.cells[2].innerHTML = duracion;
+  fila.cells[3].innerHTML = docente;
+  
+  fila.cells[4].innerHTML = `
+    <button class="btn-editar">Editar</button>
+    <button class="btn-eliminar">Eliminar</button>
+  `;
+}
+
+function eliminarCurso(fila) {
+  if (confirm('¿Estás seguro de eliminar este curso?')) {
+    fila.remove();
+  }
+}
+    </script>
+</body>
+</html>

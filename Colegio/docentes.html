@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Agregar Docentes</title>
+  <style>body {
+    font-family: Arial, sans-serif;
+    background-image: url('colegio.jpg');
+      background-repeat: repeat;
+      background-size: cover;
+      background-position: center;
+    padding: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  .navbar {
+      background-color: #05b87c;
+      color: #fff;
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+    }
+    .navbar h1 {
+      margin: 0;
+      flex: 1;
+      padding-left: 20px;
+    }
+    .navbar ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+    .navbar ul li {
+      margin-right: 10px;
+    }
+    .navbar ul li a {
+      color: #fff;
+      text-decoration: none;
+      padding: 5px;
+    }
+
+  form {
+    max-width: 400px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .input-group {
+    margin-bottom: 10px;
+  }
+  
+  .input-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .input-group input {
+    width: 50%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #05b87c;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #ffffff;
+  }
+  
+  table th, table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table th {
+    background-color: #05b87c;
+    color: #ffffff;
+  }
+  
+  table td.actions button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: #05b87c;
+    color: #ffffff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  table td.actions button:hover {
+    background-color: #45a049;
+  }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>Registrar Docentes</h1>
+  </div>
+  
+  <form id="formulario">
+    <div class="input-group">
+      <label for="identificacion">Identificación:</label>
+      <input type="text" id="identificacion" required>
+    </div>
+    <div class="input-group">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" required>
+    </div>
+    <div class="input-group">
+      <label for="correo">Correo:</label>
+      <input type="email" id="correo" required>
+    </div>
+    <div class="input-group">
+      <label for="profesion">Profesión:</label>
+      <input type="text" id="profesion" required>
+    </div>
+    <button type="submit">Agregar</button>
+  </form>
+
+  <table id="tabla-profesionales">
+    <thead>
+      <tr>
+        <th>Identificación</th>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Profesión</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+const formulario = document.getElementById('formulario');
+const tablaProfesionales = document.getElementById('tabla-profesionales');
+const tbody = tablaProfesionales.querySelector('tbody');
+
+formulario.addEventListener('submit', (e) => {
+  e.preventDefault();
+  
+  const identificacion = document.getElementById('identificacion').value;
+  const nombre = document.getElementById('nombre').value;
+  const correo = document.getElementById('correo').value;
+  const profesion = document.getElementById('profesion').value;
+  
+  // Agregar el profesional a la tabla
+  agregarProfesional(identificacion, nombre, correo, profesion);
+  
+  // Limpiar el formulario
+  formulario.reset();
+});
+
+tablaProfesionales.addEventListener('click', (e) => {
+  const fila = e.target.parentElement.parentElement;
+  const identificacion = fila.cells[0].textContent;
+  const nombre = fila.cells[1].textContent;
+  const correo = fila.cells[2].textContent;
+  const profesion = fila.cells[3].textContent;
+  
+  if (e.target.classList.contains('btn-editar')) {
+    editarProfesional(fila, identificacion, nombre, correo, profesion);
+  } else if (e.target.classList.contains('btn-guardar')) {
+    guardarEdicion(fila);
+  } else if (e.target.classList.contains('btn-cancelar')) {
+    cancelarEdicion(fila, identificacion, nombre, correo, profesion);
+  } else if (e.target.classList.contains('btn-eliminar')) {
+    eliminarProfesional(fila);
+  }
+});
+
+function agregarProfesional(identificacion, nombre, correo, profesion) {
+  const fila = document.createElement('tr');
+  fila.innerHTML = `
+    <td>${identificacion}</td>
+    <td>${nombre}</td>
+    <td>${correo}</td>
+    <td>${profesion}</td>
+    <td class="actions">
+      <button class="btn-editar">Editar</button>
+      </br>
+      <button class="btn-eliminar">Eliminar</button>
+    </td>
+  `;
+
+  tbody.appendChild(fila);
+}
+
+function editarProfesional(fila, identificacion, nombre, correo, profesion) {
+  const identificacionInput = document.createElement('input');
+  identificacionInput.type = 'text';
+  identificacionInput.value = identificacion;
+  
+  const nombreInput = document.createElement('input');
+  nombreInput.type = 'text';
+  nombreInput.value = nombre;
+  
+  const correoInput = document.createElement('input');
+  correoInput.type = 'email';
+  correoInput.value = correo;
+  
+  const profesionInput = document.createElement('input');
+  profesionInput.type = 'text';
+  profesionInput.value = profesion;
+  
+  fila.cells[0].innerHTML = '';
+  fila.cells[0].appendChild(identificacionInput);
+  
+  fila.cells[1].innerHTML = '';
+  fila.cells[1].appendChild(nombreInput);
+  
+  fila.cells[2].innerHTML = '';
+  fila.cells[2].appendChild(correoInput);
+  
+  fila.cells[3].innerHTML = '';
+  fila.cells[3].appendChild(profesionInput);
+  
+  fila.cells[4].innerHTML = `
+    <button class="btn-guardar">Guardar</button>
+  </br>
+    <button class="btn-cancelar">Cancelar</button>
+  `;
+}
+
+function guardarEdicion(fila) {
+  const identificacion = fila.cells[0].querySelector('input').value;
+  const nombre = fila.cells[1].querySelector('input').value;
+  const correo = fila.cells[2].querySelector('input').value;
+  const profesion = fila.cells[3].querySelector('input').value;
+  
+  fila.cells[0].innerHTML = identificacion;
+  fila.cells[1].innerHTML = nombre;
+  fila.cells[2].innerHTML = correo;
+  fila.cells[3].innerHTML = profesion;
+  
+  fila.cells[4].innerHTML = `
+    <button class="btn-editar">Editar</button>
+    <button class="btn-eliminar">Eliminar</button>
+  `;
+}
+
+function cancelarEdicion(fila, identificacion, nombre, correo, profesion) {
+  fila.cells[0].innerHTML = identificacion;
+  fila.cells[1].innerHTML = nombre;
+  fila.cells[2].innerHTML = correo;
+  fila.cells[3].innerHTML = profesion;
+  
+  fila.cells[4].innerHTML = `
+    <button class="btn-editar">Editar</button>
+    <button class="btn-eliminar">Eliminar</button>
+  `;
+}
+
+function eliminarProfesional(fila) {
+  if (confirm('¿Estás seguro de eliminar este profesional?')) {
+    fila.remove();
+  }
+}
+
+  </script>
+</body>
+</html>
